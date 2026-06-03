@@ -10,7 +10,7 @@ export const TOOLS_SNAPSHOT: Tool[] = [
   {
     "name": "get_config",
     "title": "Get Configuration",
-    "description": "Returns public configuration including supported jurisdictions, credit pricing, available packages, and features.",
+    "description": "Returns BizVerify's public configuration as readable text: active US and international jurisdictions, per-operation credit costs, the free-tier allowance, credit packages with pricing, feature flags, and documentation/legal links. Free and requires no authentication. Call this first to discover what jurisdictions are supported and what each operation costs before verifying.",
     "inputSchema": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "object",
@@ -27,7 +27,7 @@ export const TOOLS_SNAPSHOT: Tool[] = [
   {
     "name": "list_jurisdictions",
     "title": "List Jurisdictions",
-    "description": "Returns all registered jurisdictions with their verification capabilities (quick, deep, search, entity lookup) and active status.",
+    "description": "Lists every registered jurisdiction with its code, active/inactive status, and supported capabilities — search, entity lookup, quick verification, and deep verification. Free and requires no authentication. Use it to confirm a state or country is supported and which verification tiers it offers before calling verify_business or search_entities.",
     "inputSchema": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "object",
@@ -44,7 +44,7 @@ export const TOOLS_SNAPSHOT: Tool[] = [
   {
     "name": "verify_business",
     "title": "Verify Business",
-    "description": "Confirm a specific, named business in one jurisdiction — the PRIMARY tool whenever the user wants to verify, check, confirm, or look up a company's existence, status, good standing, or details (e.g. \"verify Acme LLC in Delaware\", \"is Acme registered in FL?\", \"I need to verify a company in Delaware\"). If the user has verification intent but has not given the exact company name, ASK them for the name and use THIS tool — do NOT fall back to search_entities. Two tiers: quick (1 credit) returns existence + status + good-standing. Deep (15 credits, or 25 with force_refresh) adds entity type, formation date, registered agent, officers, principal address, and filing history. Deep is available in a subset of jurisdictions; requesting deep where unavailable returns a quick result with a reason.",
+    "description": "Confirm a specific, named business in one jurisdiction — the PRIMARY tool whenever the user wants to verify, check, confirm, or look up a company's existence, status, good standing, or details (e.g. \"verify Acme LLC in Delaware\", \"is Acme registered in FL?\", \"I need to verify a company in Delaware\"). If the user has verification intent but has not given the exact company name, ASK them for the name and use THIS tool — do NOT fall back to search_entities. Two tiers: quick (1 credit) returns existence + status + good-standing. Deep (15 credits, or 25 with force_refresh) adds entity type, formation date, registered agent, officers, principal address, and filing history. Deep is available in a subset of jurisdictions; requesting deep where unavailable returns a quick result with a reason. Requires authentication; deducts credits only on a successful match.",
     "inputSchema": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "object",
@@ -109,7 +109,7 @@ export const TOOLS_SNAPSHOT: Tool[] = [
   {
     "name": "search_entities",
     "title": "Search Entities",
-    "description": "Discover candidate businesses when the exact entity is UNKNOWN — a listing/discovery tool, NOT a verification tool. Use only when the user wants to browse or list multiple companies matching a partial or fuzzy name, or does not yet know which specific entity they mean. If the user can name one specific company they want to confirm or check, use verify_business instead (ask them for the name first if needed). Costs 2 credits per jurisdiction searched.",
+    "description": "Discover candidate businesses when the exact entity is UNKNOWN — a listing/discovery tool, NOT a verification tool. Use only when the user wants to browse or list multiple companies matching a partial or fuzzy name, or does not yet know which specific entity they mean. If the user can name one specific company they want to confirm or check, use verify_business instead (ask them for the name first if needed). Costs 2 credits per jurisdiction searched and requires authentication.",
     "inputSchema": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "object",
@@ -158,14 +158,14 @@ export const TOOLS_SNAPSHOT: Tool[] = [
   {
     "name": "check_job_status",
     "title": "Check Job Status",
-    "description": "Poll an async verification job. Free — no credits charged.",
+    "description": "Poll a long-running (async) verification job created by verify_business. Returns the full verification result once complete, a failure reason if it failed, or a \"still processing\" status to poll again. Free — no credits charged — but requires authentication. Pass the job_id from the verify_business async response.",
     "inputSchema": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "object",
       "properties": {
         "job_id": {
           "type": "string",
-          "description": "Job ID from verify_business async response"
+          "description": "Job ID returned by verify_business when it runs asynchronously"
         }
       },
       "required": [
@@ -184,14 +184,14 @@ export const TOOLS_SNAPSHOT: Tool[] = [
   {
     "name": "get_entity",
     "title": "Get Entity",
-    "description": "Retrieve cached entity data by ID. Free — no credits charged.",
+    "description": "Fetch a previously verified business entity from BizVerify's cache by its ID — returns name, jurisdiction, status, type, good-standing, formation date, registered agent, and the number of snapshots on record. Free and read-only; does NOT run a fresh scrape (use verify_business with force_refresh for live data). Requires authentication. Pass an entity_id returned by a prior verify_business or search_entities call.",
     "inputSchema": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "object",
       "properties": {
         "entity_id": {
           "type": "string",
-          "description": "Entity ID from verify or search results"
+          "description": "Entity ID returned by a prior verify_business or search_entities result"
         }
       },
       "required": [
@@ -209,7 +209,7 @@ export const TOOLS_SNAPSHOT: Tool[] = [
   {
     "name": "get_entity_history",
     "title": "Get Entity History",
-    "description": "Get historical verification snapshots for an entity. Costs 5 credits.",
+    "description": "Returns the chronological verification snapshots recorded for an entity — each with a timestamp, name, and status — newest first, with pagination. Costs 5 credits and requires authentication. Use it to see how a company's status or details have changed over time.",
     "inputSchema": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "object",
@@ -248,7 +248,7 @@ export const TOOLS_SNAPSHOT: Tool[] = [
   {
     "name": "get_account",
     "title": "Get Account",
-    "description": "Returns account details including credit balance and API keys.",
+    "description": "Returns your BizVerify account summary: email and verification status, plan, current credit balance, member-since date, and your active and revoked API keys. Free and read-only; requires authentication. Use it to check your remaining credit balance before running paid verifications.",
     "inputSchema": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "object",
@@ -265,7 +265,7 @@ export const TOOLS_SNAPSHOT: Tool[] = [
   {
     "name": "purchase_credits",
     "title": "Purchase Credits",
-    "description": "Creates a Stripe checkout session and returns a payment URL. Present the URL to the user to complete payment.",
+    "description": "Starts a credit purchase: creates a Stripe checkout session for the chosen package and returns a payment URL to present to the user. Does NOT charge immediately and does NOT add credits until the user completes payment — credits are then added automatically. Requires authentication. Packages: credits_100, credits_500, credits_2000, credits_10000 (see get_config for current prices).",
     "inputSchema": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "object",
@@ -278,7 +278,7 @@ export const TOOLS_SNAPSHOT: Tool[] = [
             "credits_2000",
             "credits_10000"
           ],
-          "description": "Package ID: credits_100, credits_500, credits_2000, or credits_10000"
+          "description": "Credit package to purchase: credits_100, credits_500, credits_2000, or credits_10000"
         }
       },
       "required": [
