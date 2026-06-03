@@ -1,0 +1,47 @@
+{
+  "name": "bizverify-mcp",
+  "version": "0.1.0",
+  "description": "Official BizVerify MCP server — verify and search business entities across US state and international company registries from any MCP client.",
+  "type": "module",
+  "bin": {
+    "bizverify-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "bizverify",
+    "kyb",
+    "business-verification",
+    "company-data",
+    "secretary-of-state",
+    "entity-verification"
+  ],
+  "author": "BizVerify",
+  "license": "MIT",
+  "homepage": "https://bizverify.co/mcp/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BizVerify/bizverify-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BizVerify/bizverify-mcp/issues"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.3"
+  }
+}
